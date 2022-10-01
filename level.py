@@ -15,21 +15,31 @@ font = pygame.font.Font("assets/Roboto-Black.ttf", 100)
 class Level:
     def __init__(self) -> None:
         self.display_surface = pygame.display.get_surface()
+
+        # Groups
         self.camera_grp = CameraGroup()
         self.obstacles = ObstaclesGroup()
+
+        # Player
         self.player = Player([self.camera_grp], (100, 250), self.obstacles)
+
+        # Assets
         obstacles_sp = pygame.image.load(
             "assets\\Obstacle.png").convert_alpha()
+
+        # Obstacle Configration
         self.obstacles_sp = pygame.transform.scale(obstacles_sp, (140, 140))
         self.positions = [100, 410, 250]
         self.game_speed = 10
 
+        # Spawn
         self.spawn_interval = 1000
         self.last_spawn = 0
         self.min_spawn = 400
 
         self.game_running = True
 
+        # Audio
         self.mixer = pygame.mixer.Channel(0)
         self.bg_music = pygame.mixer.Sound("assets/Background.wav")
         self.mixer.play(self.bg_music)

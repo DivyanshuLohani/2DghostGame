@@ -13,6 +13,7 @@ class Player(pygame.sprite.Sprite):
     def __init__(self, groups, pos, obstacles) -> None:
         super().__init__(groups)
         self.sprite_sheet = SpriteSheet("assets/Ghost.png")
+
         self.anims = [
             self.sprite_sheet.get_sprite(130, 100, 520, 540, 150),
             self.sprite_sheet.get_sprite(900, 100, 520, 540, 150),
@@ -36,6 +37,10 @@ class Player(pygame.sprite.Sprite):
 
         # God Mode
         self.god_mode = False
+        self.god_mode_image = pygame.transform.scale(
+            pygame.image.load("assets/godmode.jpg"),
+            (50, 50)
+        )
 
     def input(self, event):
 
@@ -65,6 +70,9 @@ class Player(pygame.sprite.Sprite):
             sprite.kill()
             if isinstance(sprite, PointObstacle):
                 self.points += 2
+                if self.points % 20 == 0:
+                    self.point_sound.play()
+
             else:
                 Particles.create_particle(
                     self.groups(), self.rect.center, "black", 50)
@@ -83,11 +91,21 @@ class Player(pygame.sprite.Sprite):
         score_txt = font.render(f"{self.points}", True, "white")
         lives_txt = font.render(f"{self.lives}", True, "white")
         self.display_surface.blit(score_txt, (30, 10))
+
+        # TODO: add blinking when 1 Life is left
+        # if self.lives == 1:
+        #     if pygame.time.get_ticks() % 500 == 0:
+        #         self.display_surface.blit(
+        #             lives_txt, ((WINDOW_WIDTH - lives_txt.get_width()) - 30, 10))
+        # else:
         self.display_surface.blit(
             lives_txt, ((WINDOW_WIDTH - lives_txt.get_width()) - 30, 10))
+
         if self.god_mode:
-            pygame.draw.rect(self.display_surface, "green",
-                             (WINDOW_WIDTH // 2, 10, 50, 50))
+            self.display_surface.blit(
+                self.god_mode_image,
+                (WINDOW_WIDTH // 2, 10)
+            )
 
     def update(self, *args, **kwargs) -> None:
         self.animate()
