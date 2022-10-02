@@ -8,14 +8,21 @@ class Game:
     def __init__(self) -> None:
         pygame.init()
         self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+        pygame.mouse.set_cursor(
+            (8, 8), (0, 0), (0, 0, 0, 0, 0, 0, 0, 0), (0, 0, 0, 0, 0, 0, 0, 0))
         pygame.display.set_caption("Shooter Game")
         self.clock = pygame.time.Clock()
         self.level = Level()
 
     def run(self):
         while True:
-
+            events = pygame.event.get()
+            for event in events:
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    exit()
             self.level.run()
+            self.level.events(events)
 
             pygame.display.update()
 
