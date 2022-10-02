@@ -10,7 +10,9 @@ class Game:
         self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
         pygame.mouse.set_cursor(
             (8, 8), (0, 0), (0, 0, 0, 0, 0, 0, 0, 0), (0, 0, 0, 0, 0, 0, 0, 0))
-        pygame.display.set_caption("Shooter Game")
+        pygame.display.set_caption("Ghost Runner")
+        pygame.display.set_icon(pygame.image.load(
+            "assets/Obstacle.png"))
         self.clock = pygame.time.Clock()
         self.level = Level()
 

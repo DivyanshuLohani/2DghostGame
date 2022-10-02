@@ -12,7 +12,7 @@ class Particles(pygame.sprite.Sprite):
         self.color = color
 
     @staticmethod
-    def create_particle(group, pos, color, number=1):
+    def create_particle(group, pos, color, number=1, speed=None):
         for _ in range(number):
 
             Particles(
@@ -21,7 +21,7 @@ class Particles(pygame.sprite.Sprite):
                 direction=pygame.Vector2(
                     random.uniform(-1, 1), random.uniform(-1, 1)),
                 lifetime=random.randint(0, 30),
-                speed=random.randint(1, 10),
+                speed=random.randint(1, speed or 10),
                 color=color
             )
 

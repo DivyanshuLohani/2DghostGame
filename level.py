@@ -51,7 +51,7 @@ class Level:
         # Audio
         self.mixer = pygame.mixer.Channel(0)
         self.bg_music = pygame.mixer.Sound("assets/Background.wav")
-        self.mixer.play(self.bg_music)
+        self.mixer.play(self.bg_music, 5)
 
         self.game_started = False
 
@@ -103,7 +103,7 @@ class Level:
                     key = pygame.mouse.get_pressed(3)
                     color = "white" if not key[0] else "black"
                     Particles.create_particle(
-                        [self.ui_group], self.cursor_rect.topleft, color, 1
+                        [self.ui_group], self.cursor_rect.topleft, color, 1, speed=2
                     )
             if self.game_running:
                 self.player.input(event)
@@ -111,6 +111,7 @@ class Level:
                 if self.play_button.hovering:
                     self.game_started = True
                     self.play_button.hovering = False
+                    self.mixer.play(self.bg_music, 5)
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_r:
                     if not self.game_running:

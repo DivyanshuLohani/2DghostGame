@@ -50,17 +50,17 @@ class Player(pygame.sprite.Sprite):
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_w or event.key == pygame.K_UP:
                 if not self.rect.topleft[1] == self.min_y:
-                    self.rect.topleft -= pygame.Vector2(0, 150)
-                    self.groups()[0].camera_shake()
                     Particles.create_particle(
                         self.groups(), self.rect.center, "white", 30)
+                    self.rect.topleft -= pygame.Vector2(0, 150)
+                    self.groups()[0].camera_shake()
 
             if event.key == pygame.K_s or event.key == pygame.K_DOWN:
                 if not self.rect.topleft[1] == self.max_y:
-                    self.rect.topleft += pygame.Vector2(0, 150)
-                    self.groups()[0].camera_shake()
                     Particles.create_particle(
                         self.groups(), self.rect.center, "white", 30)
+                    self.rect.topleft += pygame.Vector2(0, 150)
+                    self.groups()[0].camera_shake()
 
             if event.key == pygame.K_g:
                 self.god_mode = not self.god_mode
