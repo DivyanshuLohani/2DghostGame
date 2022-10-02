@@ -83,11 +83,19 @@ class Level:
                         self.mixer.set_volume(1)
                         self.mixer.play(self.bg_music, True, fade_ms=1000)
                         self.spawn_interval = 1000
+                if event.key == pygame.K_m:
+                    if self.player.mute_audio:
+                        self.player.mute_audio = False
+                        self.mixer.set_volume(1)
+                    else:
+                        self.player.mute_audio = True
+                        self.mixer.set_volume(0)
 
         if self.player.lives <= 0:
             self.game_running = False
             self.player.kill()
-
+            if self.player.mute_audio:
+                return
             for i in range(10, 3, -1):
                 self.mixer.set_volume(i/10)
 
