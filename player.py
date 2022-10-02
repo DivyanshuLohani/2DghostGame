@@ -1,7 +1,7 @@
 import pygame
 from obstacle import PointObstacle
 from particles import Particles
-from settings import WINDOW_WIDTH
+from settings import WINDOW_HEIGHT, WINDOW_WIDTH
 
 from spritesheet import SpriteSheet
 
@@ -34,6 +34,9 @@ class Player(pygame.sprite.Sprite):
         # Sounds
         self.point_sound = pygame.mixer.Sound("assets/point.wav")
         self.hit_sound = pygame.mixer.Sound("assets/hit.wav")
+        self.mute_audio = False
+        self.mute_image = pygame.transform.scale(
+            pygame.image.load("assets/mute.png"), (64, 64))
 
         # God Mode
         self.god_mode = False
@@ -70,14 +73,16 @@ class Player(pygame.sprite.Sprite):
             sprite.kill()
             if isinstance(sprite, PointObstacle):
                 self.points += 2
-                if self.points % 20 == 0:
-                    self.point_sound.play()
+                if self.points % 50 == 0:
+                    if not self.mute_audio:
+                        self.point_sound.play()
 
             else:
                 Particles.create_particle(
                     self.groups(), self.rect.center, "black", 50)
                 self.groups()[0].camera_shake()
-                self.hit_sound.play(fade_ms=100)
+                if not self.mute_audio:
+                    self.hit_sound.play(fade_ms=100)
                 if not self.god_mode:
                     self.lives -= 1
 
@@ -106,6 +111,9 @@ class Player(pygame.sprite.Sprite):
                 self.god_mode_image,
                 (WINDOW_WIDTH // 2, 10)
             )
+        if self.mute_audio:
+            self.display_surface.blit(
+                self.mute_image, (30, WINDOW_HEIGHT - (self.mute_image.get_width() + 20)))
 
     def update(self, *args, **kwargs) -> None:
         self.animate()
