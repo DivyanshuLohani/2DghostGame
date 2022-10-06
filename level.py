@@ -34,7 +34,7 @@ class Level:
 
         # Assets
         obstacles_sp = pygame.image.load(
-            "assets\\Obstacle.png").convert_alpha()
+            "assets/Obstacle.png").convert_alpha()
 
         # Obstacle Configration
         self.obstacles_sp = pygame.transform.scale(obstacles_sp, (140, 140))
@@ -161,7 +161,7 @@ class CameraGroup(pygame.sprite.Group):
         self.offset = pygame.math.Vector2(100, 200)
 
         self.background = pygame.image.load(
-            "assets\\Environment.png").convert_alpha()
+            "assets/Environment.png").convert_alpha()
         self.background.fill((0, 0, 0), None, pygame.BLEND_RGBA_MULT)
         self.bgs = [
             # Bottom

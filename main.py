@@ -1,6 +1,6 @@
 import sys
 import pygame
-from settings import BG_COLOR, WINDOW_HEIGHT, WINDOW_WIDTH, FPS
+from settings import WINDOW_HEIGHT, WINDOW_WIDTH, FPS
 from level import Level
 
 
@@ -22,7 +22,7 @@ class Game:
             for event in events:
                 if event.type == pygame.QUIT:
                     pygame.quit()
-                    exit()
+                    sys.exit()
             self.level.run()
             self.level.events(events)
 
