@@ -2,6 +2,8 @@
 
 This a simple endless game made in pygame and python. The art is by [@Blackthornprod](https://www.youtube.com/c/Blackthornprod)
 
+![ScreenShot](/resources/imgs/readme.png)
+
 ## Installation
 
 Clone the repository with
