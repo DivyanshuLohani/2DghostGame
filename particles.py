@@ -3,13 +3,15 @@ import pygame
 
 
 class Particles(pygame.sprite.Sprite):
-    def __init__(self, group, pos, direction, lifetime, speed, color) -> None:
+    def __init__(self, group, pos, direction, lifetime, speed, color, radius=None, reduce_with_lifetime=True) -> None:
         super().__init__(*group)
         self.pos = pos
         self.direction = direction
         self.lifetime = lifetime
         self.speed = speed
         self.color = color
+        self.radius = radius or lifetime // 2
+        self.reduce_with_lifetime = reduce_with_lifetime
 
     @staticmethod
     def create_particle(group, pos, color, number=1, speed=None):
@@ -26,10 +28,13 @@ class Particles(pygame.sprite.Sprite):
             )
 
     def draw(self, surf: pygame.Surface):
-        pygame.draw.circle(surf, self.color, self.pos, self.lifetime // 2)
-        surface = pygame.Surface((self.lifetime, self.lifetime))
+        if self.reduce_with_lifetime:
+            self.radius = self.lifetime
+
+        pygame.draw.circle(surf, self.color, self.pos, self.radius)
+        surface = pygame.Surface((self.radius, self.radius))
         pygame.draw.circle(surface, (20, 20, 20),
-                           (self.lifetime, (self.lifetime)), self.lifetime)
+                           (self.pos), self.radius)
         surface.set_colorkey((0, 0, 0))
         surf.blit(surface,
                   (
@@ -38,6 +43,7 @@ class Particles(pygame.sprite.Sprite):
                   special_flags=pygame.BLEND_RGBA_ADD
                   )
         self.lifetime -= 0.5
+
         self.pos += self.direction * self.speed
         if self.lifetime <= 0:
             self.kill()

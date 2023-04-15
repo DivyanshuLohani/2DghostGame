@@ -1,7 +1,7 @@
 import sys
 import pygame
 from settings import WINDOW_HEIGHT, WINDOW_WIDTH, FPS
-from level import Level
+from level import MainMenu
 
 
 class Game:
@@ -14,17 +14,18 @@ class Game:
         pygame.display.set_icon(pygame.image.load(
             "assets/Obstacle.png"))
         self.clock = pygame.time.Clock()
-        self.level = Level()
+        self.level = MainMenu(self)
 
     def run(self):
         while True:
             events = pygame.event.get()
+            self.level.draw()
             for event in events:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-            self.level.run()
-            self.level.events(events)
+                self.level.events(event)
+            self.level.update(1/FPS)
 
             pygame.display.update()
 
