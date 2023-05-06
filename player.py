@@ -14,7 +14,6 @@ class Player(pygame.sprite.Sprite):
     def __init__(self, groups, pos, obstacles) -> None:
         super().__init__(groups)
         self.sprite_sheet = SpriteSheet("assets/Ghost.png")
-
         self.anims = [
             self.sprite_sheet.get_sprite(130, 100, 520, 540, SCALE_FACTOR),
             self.sprite_sheet.get_sprite(900, 100, 520, 540, SCALE_FACTOR),

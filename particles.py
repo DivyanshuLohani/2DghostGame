@@ -1,8 +1,10 @@
 import random
 import pygame
+from settings import PARTICLES_POOL_SIZE
 
 
 class Particles(pygame.sprite.Sprite):
+
     def __init__(self, group, pos, direction, lifetime, speed, color, radius=None, reduce_with_lifetime=True) -> None:
         super().__init__(*group)
         self.pos = pos
@@ -15,17 +17,23 @@ class Particles(pygame.sprite.Sprite):
 
     @staticmethod
     def create_particle(group, pos, color, number=1, speed=None):
-        for _ in range(number):
+        for i in range(number):
 
-            Particles(
-                group,
-                pos,
-                direction=pygame.Vector2(
-                    random.uniform(-1, 1), random.uniform(-1, 1)),
-                lifetime=random.randint(0, 30),
-                speed=random.randint(1, speed or 10),
-                color=color
+            while PARTICLES[i].lifetime > 0:
+                i += 1
+                if i > len(PARTICLES) - 1:
+                    break
+            if i == len(PARTICLES):
+                break
+            PARTICLES[i].add([group])
+            PARTICLES[i].pos = pos
+            PARTICLES[i].direction = pygame.Vector2(
+                random.uniform(-1, 1),
+                random.uniform(-1, 1)
             )
+            PARTICLES[i].lifetime = random.randint(0, 30)
+            PARTICLES[i].speed = random.randint(1, speed or 10)
+            PARTICLES[i].color = color
 
     def draw(self, surf: pygame.Surface):
         if self.reduce_with_lifetime:
@@ -46,4 +54,10 @@ class Particles(pygame.sprite.Sprite):
 
         self.pos += self.direction * self.speed
         if self.lifetime <= 0:
-            self.kill()
+            self.remove(self.groups())
+
+
+PARTICLES = [
+    Particles("", (0, 0), (0, 0), 0, 0, (255, 255, 255))
+    for _ in range(PARTICLES_POOL_SIZE)
+]
