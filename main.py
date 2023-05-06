@@ -19,7 +19,6 @@ class Game:
     def run(self):
         while True:
             events = pygame.event.get()
-            self.level.draw()
             for event in events:
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -27,6 +26,7 @@ class Game:
                 self.level.events(event)
             self.level.update(1/FPS)
 
+            self.level.draw()
             pygame.display.update()
 
             self.clock.tick(FPS)

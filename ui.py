@@ -59,3 +59,24 @@ class Button(pygame.sprite.Sprite):
             ((WINDOW_WIDTH - self.text.get_width()) // 2) + offset_x,
             (WINDOW_HEIGHT // 2 - self.text.get_height()) + offset_y
         )
+
+
+class BlinkSprite(pygame.sprite.Sprite):
+    def __init__(self, groups, pos, image, interval=100) -> None:
+        super().__init__([groups])
+        self.image = image
+        self.rect = self.image.get_rect()
+        self.rect.topleft = pos
+        self.interval = interval
+        self.last_time = 0
+        self.current_time = pygame.time.get_ticks()
+        self.is_draw = True
+
+    def update(self):
+        if pygame.time.get_ticks() - self.last_time > self.interval:
+            self.is_draw = not self.is_draw
+            self.last_time = pygame.time.get_ticks()
+
+    def draw(self, surf):
+        if self.is_draw:
+            surf.blit(self.image, self.rect)
