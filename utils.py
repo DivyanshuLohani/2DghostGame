@@ -2,7 +2,6 @@ import os
 from sys import platform
 import pygame
 
-from settings import PACKAGE_NAME
 
 pygame.font.init()
 
