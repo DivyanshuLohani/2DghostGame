@@ -7,6 +7,7 @@ from particles import Particles
 from player import Player
 from settings import BG_COLOR, DEBUG, WINDOW_HEIGHT, WINDOW_WIDTH
 from sprites import ScrollingEnvironment
+from audio import AudioManager
 
 pygame.font.init()
 pygame.mixer.init()
@@ -100,7 +101,7 @@ class Level(Screen):
         self.game_running = True
 
         # Audio
-        self.mixer = pygame.mixer.Channel(0)
+        self.mixer = AudioManager()
         self.bg_music = pygame.mixer.Sound("assets/Background.wav")
         self.mixer.play(self.bg_music, 5)
 
@@ -118,10 +119,10 @@ class Level(Screen):
         if self.player.lives <= 0:
             self.game_running = False
             self.player.kill()
-            if self.player.mute_audio:
+            if self.mixer.muted:
                 return
             for i in range(10, 3, -1):
-                self.mixer.set_volume(i/10)
+                self.mixer.mixer.set_volume(i/10)
 
         if randint(0, 1000) == 10:
             pos = (randint(0, WINDOW_WIDTH), randint(0, WINDOW_HEIGHT))
@@ -159,16 +160,11 @@ class Level(Screen):
                     self.player = Player(
                         [self.camera_grp], (100, 250), self.obstacles
                     )
-                    self.mixer.set_volume(1)
-                    self.mixer.play(self.bg_music, True, fade_ms=1000)
+                    self.mixer.mixer.set_volume(1)
+                    self.mixer.play(self.bg_music, True)
                     self.spawn_interval = 1000
             if event.key == pygame.K_m:
-                if self.player.mute_audio:
-                    self.player.mute_audio = False
-                    self.mixer.set_volume(1)
-                else:
-                    self.player.mute_audio = True
-                    self.mixer.set_volume(0)
+                self.mixer.toggle_mute()
 
     def spawn(self):
         if not self.game_running:

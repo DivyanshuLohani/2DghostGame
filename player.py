@@ -4,6 +4,8 @@ from particles import Particles
 from settings import WINDOW_HEIGHT, WINDOW_WIDTH, SCALE_FACTOR
 from ui import BlinkSprite
 
+
+from audio import AudioManager
 from spritesheet import SpriteSheet
 
 pygame.font.init()
@@ -34,7 +36,7 @@ class Player(pygame.sprite.Sprite):
         # Sounds
         self.point_sound = pygame.mixer.Sound("assets/point.wav")
         self.hit_sound = pygame.mixer.Sound("assets/hit.wav")
-        self.mute_audio = False
+        self.mixer = AudioManager()
         self.mute_image = pygame.transform.scale(
             pygame.image.load("assets/mute.png"), (64, 64))
 
@@ -83,15 +85,14 @@ class Player(pygame.sprite.Sprite):
             if isinstance(sprite, PointObstacle):
                 self.points += 2
                 if self.points % 50 == 0:
-                    if not self.mute_audio:
-                        self.point_sound.play()
+                    self.mixer.play_fx(self.point_sound)
 
             else:
                 Particles.create_particle(
                     self.groups(), self.rect.center, "black", 50)
                 self.groups()[0].camera_shake()
-                if not self.mute_audio:
-                    self.hit_sound.play(fade_ms=100)
+
+                self.mixer.play_fx(self.hit_sound)
                 if not self.god_mode:
                     self.lives -= 1
                     self.lives_txt = font.render(
@@ -121,7 +122,7 @@ class Player(pygame.sprite.Sprite):
                 self.god_mode_image,
                 (WINDOW_WIDTH // 2, 10)
             )
-        if self.mute_audio:
+        if self.mixer.muted:
             self.display_surface.blit(
                 self.mute_image, (30, WINDOW_HEIGHT - (self.mute_image.get_width() + 20)))
 
