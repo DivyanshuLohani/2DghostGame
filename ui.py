@@ -25,6 +25,25 @@ class UICursor(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
 
 
+class Text(pygame.sprite.Sprite):
+    def __init__(self, group, text, pos=None, color=None, size=80) -> None:
+        super().__init__([group])
+
+        self.font = get_font(size)
+        self.txt = ""
+        if color is None:
+            color = "white"
+        if pos is None:
+            pos = (0, 0)
+        self.text = self.font.render(
+            text, True, color,
+        )
+        self.image = self.text
+        self.rect = pygame.rect.Rect(
+            *pos, self.text.get_width(), self.text.get_height()
+        )
+
+
 class Button(pygame.sprite.Sprite):
     def __init__(self, group, pos, text, size=80) -> None:
         super().__init__([group])
@@ -54,10 +73,10 @@ class Button(pygame.sprite.Sprite):
             )
 
     def center(self, window, offset_x=0, offset_y=0):
-        WINDOW_WIDTH, WINDOW_HEIGHT = window
+        width, height = window
         self.rect.topleft = (
-            ((WINDOW_WIDTH - self.text.get_width()) // 2) + offset_x,
-            (WINDOW_HEIGHT // 2 - self.text.get_height()) + offset_y
+            ((width - self.text.get_width()) // 2) + offset_x,
+            (height // 2 - self.text.get_height()) + offset_y
         )
 
 
