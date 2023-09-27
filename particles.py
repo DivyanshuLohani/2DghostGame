@@ -1,11 +1,23 @@
 import random
 import pygame
-from settings import PARTICLES_POOL_SIZE
+from settings import PARTICLES_POOL_SIZE, DEBUG
+from utils import get_font
 
 
 class Particles(pygame.sprite.Sprite):
 
-    def __init__(self, group, pos, direction, lifetime, speed, color, radius=None, reduce_with_lifetime=True) -> None:
+    def __init__(
+        self,
+        group,
+        id,
+        pos,
+        direction,
+        lifetime,
+        speed,
+        color,
+        radius=None,
+        reduce_with_lifetime=True
+    ) -> None:
         super().__init__(*group)
         self.pos = pos
         self.direction = direction
@@ -14,9 +26,12 @@ class Particles(pygame.sprite.Sprite):
         self.color = color
         self.radius = radius or lifetime // 2
         self.reduce_with_lifetime = reduce_with_lifetime
+        if DEBUG:
+            self.font = get_font(14)
+            self.text = self.font.render(str(id), True, "green")
 
     @staticmethod
-    def create_particle(group, pos, color, number=1, speed=None):
+    def create_particle(group, pos, color, number=1, speed=None, radius=None, reduce_with_life=True):
         for i in range(number):
 
             while PARTICLES[i].lifetime > 0:
@@ -34,6 +49,8 @@ class Particles(pygame.sprite.Sprite):
             PARTICLES[i].lifetime = random.randint(0, 30)
             PARTICLES[i].speed = random.randint(1, speed or 10)
             PARTICLES[i].color = color
+            PARTICLES[i].radius = radius or PARTICLES[i].lifetime // 2
+            PARTICLES[i].reduce_with_lifetime = reduce_with_life
 
     def draw(self, surf: pygame.Surface):
         if self.reduce_with_lifetime:
@@ -43,7 +60,9 @@ class Particles(pygame.sprite.Sprite):
         surface = pygame.Surface((self.radius, self.radius))
         pygame.draw.circle(surface, (20, 20, 20),
                            (self.pos), self.radius)
-        surface.set_colorkey((0, 0, 0))
+        # surface.set_colorkey((0, 0, 0))
+        if DEBUG:
+            surface.blit(self.text, (0, 0))
         surf.blit(surface,
                   (
                       self.pos[0] - self.lifetime // 2,
@@ -58,6 +77,6 @@ class Particles(pygame.sprite.Sprite):
 
 
 PARTICLES = [
-    Particles("", (0, 0), (0, 0), 0, 0, (255, 255, 255))
+    Particles("", _, (0, 0), (0, 0), 0, 0, (255, 255, 255))
     for _ in range(PARTICLES_POOL_SIZE)
 ]
