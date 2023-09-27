@@ -1,7 +1,7 @@
 import math
 from random import uniform, choice, randint
 import pygame
-from ui import Button, UICursor, debug
+from ui import Button, UICursor, Text
 from obstacle import Obstacle, PointObstacle
 from particles import Particles
 from player import Player
@@ -39,6 +39,15 @@ class MainMenu(Screen):
         self.play_button.center((WINDOW_WIDTH, WINDOW_HEIGHT))
         self.cursor = UICursor([])
         self.game_speed = 1
+        Text(
+            self.ui_group, "Made by Divyanshu <3",
+            (10, WINDOW_HEIGHT - 50), "white", size=30
+        )
+        if DEBUG:
+            Text(
+                self.ui_group, "DEBUG BUILD",
+                (WINDOW_WIDTH - 100, WINDOW_HEIGHT - 50), "white", size=30
+            )
 
     def draw(self):
         self.camera_grp.draw(self.game_speed)
@@ -52,15 +61,13 @@ class MainMenu(Screen):
 
     def events(self, event):
         if event.type == pygame.MOUSEMOTION:
-
-            self.cursor.rect.topleft = pygame.mouse.get_pos()
+            self.cursor.rect.topleft = event.pos
             key = pygame.mouse.get_pressed(3)
             color = "white" if not key[0] else "black"
             Particles.create_particle(
                 [self.ui_group], self.cursor.rect.center, color, 1, speed=2
             )
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-
+        elif event.type == pygame.MOUSEBUTTONDOWN and self.play_button.hovering:
             self.game.level = Level(self.game)
 
 
@@ -127,16 +134,13 @@ class Level(Screen):
         if randint(0, 1000) == 10:
             pos = (randint(0, WINDOW_WIDTH), randint(0, WINDOW_HEIGHT))
             # for i in range(randint(10, 100)):
-            Particles(
+            Particles.create_particle(
                 [self.camera_grp],
                 pos,
-                direction=pygame.Vector2(
-                    uniform(-1, 1), uniform(-1, 1)),
-                lifetime=100,
-                speed=0.2,
                 color="black",
+                speed=2,
                 radius=10,
-                reduce_with_lifetime=False
+                reduce_with_life=False
             )
 
     def draw(self):
