@@ -1,13 +1,13 @@
-import math
-from random import uniform, choice, randint
+import webbrowser
 import pygame
-from ui import Button, UICursor, Text
+from random import uniform, choice, randint
 from obstacle import Obstacle, PointObstacle
 from particles import Particles
 from player import Player
 from settings import BG_COLOR, DEBUG, WINDOW_HEIGHT, WINDOW_WIDTH
 from sprites import ScrollingEnvironment
 from audio import AudioManager
+from ui import Button, UICursor, Text
 
 pygame.font.init()
 pygame.mixer.init()
@@ -35,13 +35,15 @@ class Screen:
 class MainMenu(Screen):
     def __init__(self, game) -> None:
         super().__init__(game)
-        self.play_button = Button(self.ui_group, (0, 0), "PLAY")
+        self.play_button = Button(self.ui_group, "PLAY", (0, 0), size=80)
         self.play_button.center((WINDOW_WIDTH, WINDOW_HEIGHT))
         self.cursor = UICursor([])
         self.game_speed = 1
-        Text(
-            self.ui_group, "Made by Divyanshu <3",
-            (10, WINDOW_HEIGHT - 50), "white", size=30
+        self.website_link_text = Button(
+            self.ui_group,
+            "Made by Divyanshu <3",
+            (10, WINDOW_HEIGHT - 50),
+            "white", size=30
         )
         if DEBUG:
             Text(
@@ -57,18 +59,23 @@ class MainMenu(Screen):
     def update(self, delta_time):
         self.camera_grp.update(speed=self.game_speed)
         self.ui_group.update()
-        self.cursor.update()
 
     def events(self, event):
         if event.type == pygame.MOUSEMOTION:
-            self.cursor.rect.topleft = event.pos
+            self.cursor.rect.center = event.pos
             key = pygame.mouse.get_pressed(3)
             color = "white" if not key[0] else "black"
             Particles.create_particle(
                 [self.ui_group], self.cursor.rect.center, color, 1, speed=2
             )
-        elif event.type == pygame.MOUSEBUTTONDOWN and self.play_button.hovering:
-            self.game.level = Level(self.game)
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            if self.play_button.hovering:
+                self.game.level = Level(self.game)
+            elif self.website_link_text.hovering:
+                try:
+                    webbrowser.open("https://divyanshulohani.github.io")
+                except Exception:
+                    pass
 
 
 class Level(Screen):
@@ -83,7 +90,7 @@ class Level(Screen):
             (140, 140)
         )
         # Restart Text
-        self.r_btn = Button("", (0, 0), "R to Restart")
+        self.r_btn = Button("", "R to Restart", (0, 0), size=80)
         self.r_btn.center((WINDOW_WIDTH, WINDOW_HEIGHT))
 
         # Groups
