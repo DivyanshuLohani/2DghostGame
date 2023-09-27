@@ -30,7 +30,7 @@ class Text(pygame.sprite.Sprite):
         super().__init__([group])
 
         self.font = get_font(size)
-        self.txt = ""
+        self.txt = text
         if color is None:
             color = "white"
         if pos is None:
@@ -44,18 +44,9 @@ class Text(pygame.sprite.Sprite):
         )
 
 
-class Button(pygame.sprite.Sprite):
-    def __init__(self, group, pos, text, size=80) -> None:
-        super().__init__([group])
-        self.font = get_font(size)
-        self.txt = text
-        self.text = self.font.render(
-            text, True, "white"
-        )
-        self.image = self.text
-        self.rect = pygame.rect.Rect(
-            *pos, self.text.get_width(), self.text.get_height()
-        )
+class Button(Text):
+    def __init__(self, group, text, pos, color=None, size=80) -> None:
+        super().__init__(group, text, pos, color, size)
         self.hovering = False
 
     def update(self):
