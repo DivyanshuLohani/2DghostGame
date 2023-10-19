@@ -7,7 +7,8 @@ from player import Player
 from settings import BG_COLOR, DEBUG, WINDOW_HEIGHT, WINDOW_WIDTH
 from sprites import ScrollingEnvironment
 from audio import AudioManager
-from ui import Button, UICursor, Text
+from ui import Button, UICursor, Text, BlinkText
+from utils import read_hiscore, save_hiscore
 
 pygame.font.init()
 pygame.mixer.init()
@@ -51,6 +52,8 @@ class MainMenu(Screen):
                 (WINDOW_WIDTH - 100, WINDOW_HEIGHT - 50), "white", size=30
             )
 
+        self.high_score = read_hiscore()
+
     def draw(self):
         self.camera_grp.draw(self.game_speed)
         self.ui_group.draw(self.game.screen)
@@ -93,6 +96,14 @@ class Level(Screen):
         self.r_btn = Button("", "R to Restart", (0, 0), size=80)
         self.r_btn.center((WINDOW_WIDTH, WINDOW_HEIGHT))
 
+        self.hiscore_text = BlinkText(
+            "", (0, 0), "NEW HIGH SCORE", interval=500
+        )
+        self.hiscore_text.center(
+            (WINDOW_WIDTH, WINDOW_HEIGHT),
+            offset_y=-(self.r_btn.text.get_height() + 10)
+        )
+
         # Groups
         self.obstacles = ObstaclesGroup()
 
@@ -123,6 +134,7 @@ class Level(Screen):
 
         self.camera_grp.update(game_speed=self.game_speed)
         self.obstacles.update(game_speed=self.game_speed)
+        self.ui_group.update()
 
         if pygame.time.get_ticks() - self.last_spawn > self.spawn_interval:
             self.spawn()
@@ -130,14 +142,21 @@ class Level(Screen):
             if self.spawn_interval > self.min_spawn:
                 self.spawn_interval -= 10
 
+        # Game over
         if self.player.lives <= 0:
             self.game_running = False
             self.player.kill()
+            if self.player.points > self.player.hiscore:
+                save_hiscore(self.player.points)
+                if self.hiscore_text not in self.ui_group.sprites():
+                    self.ui_group.add(self.hiscore_text)
+
             if self.mixer.muted:
                 return
             for i in range(10, 3, -1):
                 self.mixer.mixer.set_volume(i/10)
 
+        # Ambience
         if randint(0, 1000) == 10:
             pos = (randint(0, WINDOW_WIDTH), randint(0, WINDOW_HEIGHT))
             # for i in range(randint(10, 100)):
@@ -153,6 +172,7 @@ class Level(Screen):
     def draw(self):
         self.camera_grp.draw(self.game_speed)
         self.player.draw_ui()
+        self.ui_group.draw(self.display_surface)
         if not self.game_running:
             self.display_surface.blit(self.r_btn.image, self.r_btn.rect)
         if DEBUG:
@@ -171,6 +191,7 @@ class Level(Screen):
                     self.player = Player(
                         [self.camera_grp], (100, 250), self.obstacles
                     )
+                    self.hiscore_text.kill()
                     self.mixer.mixer.set_volume(1)
                     self.mixer.play(self.bg_music, True)
                     self.spawn_interval = 1000
@@ -273,5 +294,7 @@ class UIGroup(pygame.sprite.Group):
                 sprite.draw(surface)
             elif isinstance(sprite, Button):
                 surface.blit(sprite.text, sprite.rect)
+            elif isinstance(sprite, BlinkText):
+                sprite.draw(surface)
             else:
                 surface.blit(sprite.image, sprite.rect)

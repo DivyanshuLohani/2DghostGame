@@ -3,10 +3,9 @@ from obstacle import PointObstacle
 from particles import Particles
 from settings import WINDOW_HEIGHT, WINDOW_WIDTH, SCALE_FACTOR
 from ui import BlinkSprite
-
-
 from audio import AudioManager
 from spritesheet import SpriteSheet
+from utils import read_hiscore
 
 pygame.font.init()
 font = pygame.font.Font("assets/Roboto-Black.ttf", 60)
@@ -55,6 +54,9 @@ class Player(pygame.sprite.Sprite):
             self.lives_txt,
             500
         )
+        self.hiscore = read_hiscore()
+        self.hiscore_sound = pygame.mixer.Sound("assets/hiscore.wav")
+        self.hiscore_beaten = False
 
     def input(self, event):
 
@@ -84,7 +86,10 @@ class Player(pygame.sprite.Sprite):
             sprite.kill()
             if isinstance(sprite, PointObstacle):
                 self.points += 2
-                if self.points % 50 == 0:
+                if self.points > self.hiscore and not self.hiscore_beaten:
+                    self.mixer.play_fx(self.hiscore_sound)
+                    self.hiscore_beaten = True
+                elif self.points % 50 == 0:
                     self.mixer.play_fx(self.point_sound)
 
             else:

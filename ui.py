@@ -43,6 +43,13 @@ class Text(pygame.sprite.Sprite):
             *pos, self.text.get_width(), self.text.get_height()
         )
 
+    def center(self, window, offset_x=0, offset_y=0):
+        width, height = window
+        self.rect.topleft = (
+            ((width - self.text.get_width()) // 2) + offset_x,
+            (height // 2 - self.text.get_height()) + offset_y
+        )
+
 
 class Button(Text):
     def __init__(self, group, text, pos, color=None, size=80) -> None:
@@ -62,13 +69,6 @@ class Button(Text):
             self.text = self.font.render(
                 self.txt, True, "white"
             )
-
-    def center(self, window, offset_x=0, offset_y=0):
-        width, height = window
-        self.rect.topleft = (
-            ((width - self.text.get_width()) // 2) + offset_x,
-            (height // 2 - self.text.get_height()) + offset_y
-        )
 
 
 class BlinkSprite(pygame.sprite.Sprite):
@@ -90,3 +90,18 @@ class BlinkSprite(pygame.sprite.Sprite):
     def draw(self, surf):
         if self.is_draw:
             surf.blit(self.image, self.rect)
+
+
+class BlinkText(BlinkSprite):
+    def __init__(self, groups, pos, text, color=None, interval=100, size=32) -> None:
+        font = get_font(size)
+        color = color or "white"
+        self.text = font.render(text, False, color)
+        super().__init__(groups, pos, self.text, interval)
+
+    def center(self, window, offset_x=0, offset_y=0):
+        width, height = window
+        self.rect.topleft = (
+            ((width - self.text.get_width()) // 2) + offset_x,
+            (height // 2 - self.text.get_height()) + offset_y
+        )
