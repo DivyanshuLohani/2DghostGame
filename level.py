@@ -130,6 +130,9 @@ class Level(Screen):
         self.bg_music = pygame.mixer.Sound("assets/Background.wav")
         self.mixer.play(self.bg_music, 5)
 
+        # Cursor
+        self.cursor = UICursor([])
+
     def update(self, delta_time):
 
         self.camera_grp.update(game_speed=self.game_speed)
@@ -169,12 +172,17 @@ class Level(Screen):
                 reduce_with_life=False
             )
 
+        if not self.game_running:
+            self.r_btn.update()
+
     def draw(self):
         self.camera_grp.draw(self.game_speed)
         self.player.draw_ui()
         self.ui_group.draw(self.display_surface)
         if not self.game_running:
             self.display_surface.blit(self.r_btn.image, self.r_btn.rect)
+            self.game.screen.blit(
+                self.cursor.image, self.cursor.rect.center)
         if DEBUG:
             self.obstacles.draw()
 
@@ -186,17 +194,20 @@ class Level(Screen):
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_r:
                 if not self.game_running:
-                    self.game_running = True
-                    [sprite.kill() for sprite in self.obstacles.sprites()]
-                    self.player = Player(
-                        [self.camera_grp], (100, 250), self.obstacles
-                    )
-                    self.hiscore_text.kill()
-                    self.mixer.mixer.set_volume(1)
-                    self.mixer.play(self.bg_music, True)
-                    self.spawn_interval = 1000
+                    self.reset()
             if event.key == pygame.K_m:
                 self.mixer.toggle_mute()
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            if self.r_btn.hovering and not self.game_running:
+                self.reset()
+        elif event.type == pygame.MOUSEMOTION:
+            self.cursor.rect.center = event.pos
+            if not self.game_running:
+                key = pygame.mouse.get_pressed(3)
+                color = "white" if not key[0] else "black"
+                Particles.create_particle(
+                    [self.ui_group], self.cursor.rect.center, color, 1, speed=2
+                )
 
     def spawn(self):
         if not self.game_running:
@@ -207,6 +218,17 @@ class Level(Screen):
             if i != pos:
                 Obstacle([self.camera_grp, self.obstacles], self.obstacles_sp,
                          (WINDOW_WIDTH + 400, i))
+
+    def reset(self):
+        self.game_running = True
+        [sprite.kill() for sprite in self.obstacles.sprites()]
+        self.player = Player(
+            [self.camera_grp], (100, 250), self.obstacles
+        )
+        self.hiscore_text.kill()
+        if not self.mixer.muted:
+            self.mixer.play(self.bg_music, True)
+        self.spawn_interval = 1000
 
 
 class CameraGroup(pygame.sprite.Group):
@@ -261,7 +283,9 @@ class CameraGroup(pygame.sprite.Group):
         if self.camera_shaking:
             self.cam_shake_time -= 1
             pos = pygame.Vector2(
-                uniform(-1, 1), uniform(-1, 1)) * self.cam_shake_strength
+                uniform(-1, 1),
+                uniform(-1, 1)
+            ) * self.cam_shake_strength
             if self.cam_shake_time <= 0:
                 self.camera_shaking = False
         else:
